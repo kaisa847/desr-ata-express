@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="1040" viewBox="0 0 920 1040" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<title>Position of R45-R50 on the bottom side of the ATA Express V02_04</title>
+<defs><clipPath id="zc"><rect x="70.0" y="470.0" width="760.0" height="440.8"/></clipPath><pattern id="vf" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.6" fill="#a16207"/></pattern></defs>
+<rect x="1" y="1" width="918" height="1038" rx="12" fill="#ffffff" stroke="#d6d3d1" stroke-width="2"/>
+<text x="30" y="40" font-size="20" font-weight="600" fill="#1c1917">R45–R50: location on the BOTTOM side (no silkscreen)</text>
+<text x="30" y="62" font-size="13" fill="#57534e">View onto the bottom side, so left and right are mirrored compared with the top view. Positions from the V02_04 PCB layout, to scale.</text>
+<text x="30" y="80" font-size="13" fill="#57534e">R45–R50 are 0 Ω links (0402) directly under the microSD holder. Remove these six for DDR50; leave the 10 kΩ row below them in place.</text>
+<polygon points="876.3,118.0 415.6,118.0 415.6,166.0 50.0,166.0 50.0,341.1 299.3,341.1 299.3,380.6 876.3,380.6" fill="#14532d" fill-opacity="0.10" stroke="#166534" stroke-width="2.5"/>
+<rect x="246.4" y="170.4" width="101.8" height="96.4" fill="none" stroke="#57534e" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="297.3" y="280.8" text-anchor="middle" font-size="11.5" fill="#57534e">microSD holder</text>
+<text x="297.3" y="294.8" text-anchor="middle" font-size="11.5" fill="#57534e">(top side)</text>
+<rect x="473.9" y="171.3" width="120.0" height="120.0" fill="none" stroke="#57534e" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="533.9" y="231.3" text-anchor="middle" font-size="11.5" fill="#57534e">FPGA U1</text>
+<text x="533.9" y="245.3" text-anchor="middle" font-size="11.5" fill="#57534e">(top side)</text>
+<rect x="799.4" y="151.4" width="70.4" height="202.4" fill="#e7e5e4" stroke="#44403c" stroke-width="1.5"/>
+<text x="834.6" y="256.6" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">P1</text>
+<rect x="330.5" y="339.8" width="398.6" height="32.9" fill="#e7e5e4" stroke="#44403c" stroke-width="1.5"/>
+<text x="529.8" y="360.2" text-anchor="middle" font-size="12" font-weight="600" fill="#1c1917">IDE connector J3</text>
+<rect x="599.1" y="123.7" width="48.0" height="12.0" rx="3" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+<text x="623.1" y="151.7" text-anchor="middle" font-size="11.5" fill="#6d28d9">test points T13–T16 (printed)</text>
+<rect x="320.3" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="320.3" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="311.2" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="311.2" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="302.0" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="302.0" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="284.8" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="284.8" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="267.5" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="267.5" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="258.4" y="195.2" width="4.6" height="11.3" fill="#dc2626"/>
+<rect x="258.4" y="231.7" width="4.6" height="11.3" fill="#78716c"/>
+<rect x="222.0" y="166.0" width="160.0" height="92.8" fill="none" stroke="#dc2626" stroke-width="2"/>
+<text x="388.0" y="178.0" font-size="12" font-weight="600" fill="#b91c1c">detail below</text>
+<text x="58.0" y="158.0" font-size="12" fill="#166534">board edge with the 6 mm step</text>
+<text x="876.3" y="398.6" text-anchor="end" font-size="12" fill="#57534e">BOTTOM SIDE, mirrored · 103.3 × 32.8 mm</text>
+<g clip-path="url(#zc)">
+<rect x="70.0" y="470.0" width="760.0" height="440.8" fill="#14532d" fill-opacity="0.06"/>
+<rect x="185.7" y="491.1" width="483.7" height="457.9" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="7 5"/>
+<rect x="145.6" y="602.8" width="60.8" height="27.0" fill="url(#vf)" stroke="#a16207" stroke-width="1"/>
+<circle cx="543.1" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="543.1" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">DAT2</text>
+<circle cx="504.3" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="504.3" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">DAT3</text>
+<circle cx="461.0" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="461.0" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">CMD</text>
+<circle cx="422.3" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="422.3" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">VDD</text>
+<circle cx="378.9" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="378.9" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">CLK</text>
+<circle cx="335.6" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="335.6" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">GND</text>
+<circle cx="296.9" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="296.9" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">DAT0</text>
+<circle cx="253.5" cy="567.7" r="7" fill="#fef3c7" stroke="#a16207" stroke-width="2"/>
+<text x="253.5" y="556.7" text-anchor="middle" font-size="10" fill="#92400e">DAT1</text>
+<rect x="536.8" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="536.8" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="536.8" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="493.5" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="493.5" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="493.5" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="450.2" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="450.2" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="450.2" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="368.1" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="368.1" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="368.1" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="286.0" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="286.0" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="286.0" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="242.7" y="608.5" width="21.7" height="53.6" rx="2" fill="#dc2626"/>
+<rect x="242.7" y="608.5" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="242.7" y="645.0" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="536.8" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="536.8" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="536.8" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="493.5" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="493.5" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="493.5" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="450.2" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="450.2" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="450.2" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="368.1" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="368.1" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="368.1" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="286.0" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="286.0" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="286.0" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="242.7" y="782.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="242.7" y="782.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="242.7" y="818.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="163.7" y="680.9" width="47.5" height="76.0" rx="2" fill="#78716c"/>
+<rect x="163.7" y="680.9" width="47.5" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="163.7" y="739.8" width="47.5" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="113.9" y="682.2" width="21.7" height="53.6" rx="2" fill="#78716c"/>
+<rect x="113.9" y="682.2" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="113.9" y="718.7" width="21.7" height="17.1" fill="#d6d3d1" opacity="0.9"/>
+<rect x="709.4" y="643.8" width="53.6" height="21.7" rx="2" fill="#78716c"/>
+<rect x="709.4" y="643.8" width="17.1" height="21.7" fill="#d6d3d1" opacity="0.9"/>
+<rect x="745.8" y="643.8" width="17.1" height="21.7" fill="#d6d3d1" opacity="0.9"/>
+</g>
+<rect x="70.0" y="470.0" width="760.0" height="440.8" fill="none" stroke="#dc2626" stroke-width="2"/>
+<text x="547.7" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R48</text>
+<text x="547.7" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">DAT2</text>
+<text x="504.3" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R47</text>
+<text x="504.3" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">DAT3</text>
+<text x="461.0" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R46</text>
+<text x="461.0" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">CMD</text>
+<text x="378.9" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R45</text>
+<text x="378.9" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">CLK</text>
+<text x="296.9" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R50</text>
+<text x="296.9" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">DAT0</text>
+<text x="253.5" y="679.3" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b91c1c">R49</text>
+<text x="253.5" y="693.3" text-anchor="middle" font-size="11" fill="#b91c1c">DAT1</text>
+<text x="547.7" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R74</text>
+<text x="504.3" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R75</text>
+<text x="461.0" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R76</text>
+<text x="378.9" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R62</text>
+<text x="296.9" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R72</text>
+<text x="253.5" y="850.9" text-anchor="middle" font-size="11.5" fill="#44403c">R73</text>
+<text x="157.7" y="722.9" text-anchor="end" font-size="11.5" fill="#44403c">C3</text>
+<text x="124.7" y="751.0" text-anchor="middle" font-size="11.5" fill="#44403c">R2</text>
+<text x="736.1" y="681.7" text-anchor="middle" font-size="11.5" fill="#44403c">R41</text>
+<text x="176.0" y="594.8" text-anchor="middle" font-size="11" fill="#92400e">8 vias (1V)</text>
+<text x="78.0" y="900.8" font-size="12" fill="#57534e">dashed: outline of the microSD holder on the top side</text>
+<line x1="740.0" y1="896.8" x2="816.0" y2="896.8" stroke="#1c1917" stroke-width="3"/>
+<text x="778.0" y="889.8" text-anchor="middle" font-size="11.5" fill="#1c1917">2 mm</text>
+<g font-size="13" fill="#1c1917">
+<rect x="30" y="933.8" width="14" height="14" rx="3" fill="#dc2626"/><text x="50" y="944.8">R45–R50, 0 Ω 0402: remove for DDR50 (card line ↔ path B)</text>
+<rect x="30" y="955.8" width="14" height="14" rx="3" fill="#78716c"/><text x="50" y="966.8">R62, R72–R76, 10 kΩ 0402 to VCCIO (3.3 V): leave in place; other neighbouring parts</text>
+<circle cx="37" cy="982.8" r="6" fill="#fef3c7" stroke="#a16207" stroke-width="2"/><text x="50" y="988.8">vias of the card lines, one per column, about 1.8 mm above the 0 Ω row</text>
+<text x="30" y="1014.8">Order from left to right in this bottom view: R49 DAT1 · R50 DAT0 · R45 CLK · R46 CMD · R47 DAT3 · R48 DAT2.</text>
+</g>
+</svg>

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="600" viewBox="0 0 780 600" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>ATA Express header P1 pinout (component side)</title>
+  <defs>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="8" height="8" fill="#e7e5e4"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#a8a29e" stroke-width="3"/>
+    </pattern>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57534e"/>
+    </marker>
+  </defs>
+
+  <!-- card background (solid, so the drawing reads in light and dark page themes) -->
+  <rect x="1" y="1" width="778" height="598" rx="12" fill="#ffffff" stroke="#d6d3d1" stroke-width="2"/>
+
+  <text x="30" y="40" font-size="20" font-weight="600" fill="#1c1917">Header P1 — 2 × 7, 2.54 mm, top view (component side)</text>
+  <text x="30" y="62" font-size="13" fill="#57534e">Drawn from the V02_04 PCB layout. Pin 1 = square pad. Odd pins: row next to the board edge.</text>
+
+  <!-- board edge -->
+  <rect x="30" y="90" width="16" height="420" fill="url(#hatch)" stroke="#a8a29e"/>
+  <text transform="translate(66,300) rotate(-90)" text-anchor="middle" font-size="13" fill="#57534e">board edge (left short side)</text>
+
+  <!-- shroud with key on the odd (edge) side, pins 5-9 -->
+  <path d="M 295 80 H 445 V 500 H 295 V 370 M 295 210 V 80" fill="none" stroke="#44403c" stroke-width="3"/>
+  <rect x="295" y="80" width="150" height="420" fill="#f5f5f4" opacity="0.6"/>
+  <path d="M 295 210 H 281 V 370 H 295" fill="none" stroke="#44403c" stroke-width="3" stroke-dasharray="6 4"/>
+  <text x="275" y="196" text-anchor="end" font-size="11.5" fill="#78716c">key (per footprint,</text>
+  <text x="275" y="210" text-anchor="end" font-size="11.5" fill="#78716c">not confirmed on a photo)</text>
+
+  <!-- pads: odd column x=340, even column x=400, rows y=110 + 60 n -->
+  <!-- row 1 -->
+  <rect x="327" y="97" width="26" height="26" rx="3" fill="#292524"/>
+  <text x="340" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">1</text>
+  <circle cx="400" cy="110" r="13" fill="#dc2626"/>
+  <text x="400" y="115" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">2</text>
+  <!-- row 2 -->
+  <circle cx="340" cy="170" r="13" fill="#292524"/>
+  <text x="340" y="175" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">3</text>
+  <circle cx="400" cy="170" r="13" fill="#2563eb"/>
+  <text x="400" y="175" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">4</text>
+  <!-- row 3 -->
+  <circle cx="340" cy="230" r="13" fill="#292524"/>
+  <text x="340" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">5</text>
+  <circle cx="400" cy="230" r="13" fill="#2563eb"/>
+  <text x="400" y="235" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">6</text>
+  <!-- row 4 -->
+  <circle cx="340" cy="290" r="13" fill="#b45309"/>
+  <text x="340" y="295" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">7</text>
+  <circle cx="400" cy="290" r="13" fill="#2563eb"/>
+  <text x="400" y="295" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">8</text>
+  <!-- row 5 -->
+  <circle cx="340" cy="350" r="13" fill="#b45309"/>
+  <text x="340" y="355" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">9</text>
+  <circle cx="400" cy="350" r="13" fill="#2563eb"/>
+  <text x="400" y="355" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">10</text>
+  <!-- row 6 -->
+  <circle cx="340" cy="410" r="13" fill="#b45309"/>
+  <text x="340" y="415" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">11</text>
+  <circle cx="400" cy="410" r="13" fill="#b45309"/>
+  <text x="400" y="415" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">12</text>
+  <!-- row 7 -->
+  <circle cx="340" cy="470" r="13" fill="#b45309"/>
+  <text x="340" y="475" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">13</text>
+  <circle cx="400" cy="470" r="13" fill="#b45309"/>
+  <text x="400" y="475" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">14</text>
+
+  <!-- odd labels (left) -->
+  <g font-size="14" fill="#1c1917" text-anchor="end">
+    <text x="252" y="115">GND</text>
+    <text x="252" y="175">GND</text>
+    <text x="252" y="235">GND</text>
+    <text x="252" y="295">SPI_DI</text>
+    <text x="252" y="355">SPI_WP#</text>
+    <text x="252" y="415">SPI_CLK</text>
+    <text x="252" y="475">SPI_HOLD#</text>
+  </g>
+  <!-- leader lines for the odd labels -->
+  <g stroke="#a8a29e" stroke-width="1">
+    <line x1="258" y1="110" x2="324" y2="110"/>
+    <line x1="258" y1="170" x2="324" y2="170"/>
+    <line x1="258" y1="230" x2="324" y2="230"/>
+    <line x1="258" y1="290" x2="324" y2="290"/>
+    <line x1="258" y1="350" x2="324" y2="350"/>
+    <line x1="258" y1="410" x2="324" y2="410"/>
+    <line x1="258" y1="470" x2="324" y2="470"/>
+  </g>
+
+  <!-- even labels (right) -->
+  <g font-size="14" fill="#1c1917">
+    <text x="462" y="105"><tspan font-weight="600" fill="#b91c1c">3V3</tspan> — board supply, reference only</text>
+    <text x="462" y="122" font-size="12" fill="#b91c1c">never feed the programmer's 3.3 V in here</text>
+    <text x="462" y="175"><tspan font-weight="600">TMS</tspan>  (R18 33 Ω → FPGA E12)</text>
+    <text x="462" y="235"><tspan font-weight="600">TCK</tspan>  (R19 33 Ω → FPGA E10)</text>
+    <text x="462" y="295"><tspan font-weight="600">TDO</tspan>  (R20 33 Ω ← FPGA E13)</text>
+    <text x="462" y="355"><tspan font-weight="600">TDI</tspan>  (R21 33 Ω → FPGA E11)</text>
+    <text x="462" y="415">SPI_DO</text>
+    <text x="462" y="475">SPI_CS#</text>
+  </g>
+
+  <!-- toward J3 -->
+  <line x1="370" y1="515" x2="370" y2="545" stroke="#57534e" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="385" y="540" font-size="13" fill="#57534e">towards the IDE connector J3 (long edge)</text>
+
+  <!-- legend -->
+  <g font-size="13" fill="#1c1917">
+    <rect x="30" y="562" width="14" height="14" rx="3" fill="#292524"/><text x="50" y="574">GND</text>
+    <rect x="100" y="562" width="14" height="14" rx="3" fill="#dc2626"/><text x="120" y="574">3V3 (board)</text>
+    <rect x="215" y="562" width="14" height="14" rx="3" fill="#2563eb"/><text x="235" y="574">JTAG, 3.3 V, 33 Ω series + BAT54SW clamps</text>
+    <rect x="535" y="562" width="14" height="14" rx="3" fill="#b45309"/><text x="555" y="574">SPI of the W25X40 data flash (U10)</text>
+  </g>
+</svg>

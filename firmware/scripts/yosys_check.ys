@@ -1,0 +1,8 @@
+# Synthesis check with Yosys (no place & route): syntax, inference, resources.
+# Run from firmware/:  yosys -q -l build/yosys_top.log scripts/yosys_check.ys
+read_verilog -DSYNTHESIS rtl/identify_rom.v rtl/sector_buf.v rtl/clk_rst.v rtl/ata_device.v rtl/blk_stub.v rtl/ata_udma.v rtl/sce_security.v rtl/spi_flash.v rtl/dbg_jtag.v rtl/re_capture.v
+read_verilog -DSYNTHESIS rtl/sd/sd_crc.v rtl/sd/sd_cmd.v rtl/sd/sd_data.v rtl/sd/sd_ddr.v rtl/sd/sd_host.v
+read_verilog -DSYNTHESIS rtl/top.v rtl/top_m0.v
+synth_xilinx -family xc7 -top top -flatten
+check -assert
+tee -o build/yosys_top_stat.txt stat

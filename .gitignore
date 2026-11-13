@@ -1,0 +1,17 @@
+# Only selected folders belong in the repo. Everything else (downloads/, re/, tools/, photos,
+# flash dumps, Sony firmware) stays local.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/LICENSE
+!/.github/
+!/firmware/
+
+# Build output; released bitstreams live in firmware/release/
+/firmware/build/
+__pycache__/
+.pytest_cache/
+*.pyc
+sim_build/
+results.xml

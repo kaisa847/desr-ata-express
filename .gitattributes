@@ -1,0 +1,11 @@
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.v text eol=lf
+*.ys text eol=lf
+*.xdc text eol=lf
+*.md text eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.bit binary
+*.bin binary

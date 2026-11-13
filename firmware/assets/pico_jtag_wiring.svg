@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="730" viewBox="0 0 1060 730" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>Wiring a Raspberry Pi Pico 2 running DirtyJTAG to header P1 of the ATA Express</title>
+
+  <!-- card background (solid, so the drawing reads in light and dark page themes) -->
+  <rect x="1" y="1" width="1058" height="728" rx="12" fill="#ffffff" stroke="#d6d3d1" stroke-width="2"/>
+
+  <text x="30" y="40" font-size="20" font-weight="600" fill="#1c1917">JTAG wiring: Raspberry Pi Pico 2 (DirtyJTAG 1.07) → ATA Express header P1</text>
+  <text x="30" y="62" font-size="13" fill="#57534e">Both parts seen from the top. Five jumper wires; the Pico's 3.3 V and P1 pin 2 stay unconnected.</text>
+
+  <!-- ===== Pico 2 (USB at the top, pin 1 top left, pin 21 bottom right) ===== -->
+  <g transform="translate(0,40)">
+    <rect x="110" y="28" width="50" height="26" rx="4" fill="#d6d3d1" stroke="#78716c"/>
+    <text x="135" y="46" text-anchor="middle" font-size="11" fill="#44403c">USB</text>
+    <rect x="60" y="50" width="150" height="530" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="2"/>
+    <text x="135" y="350" text-anchor="middle" font-size="15" font-weight="600" fill="#065f46" transform="rotate(-90 135 350)">Raspberry Pi Pico 2</text>
+    <!-- left column, pins 1..20 (unused, drawn for orientation) -->
+    <g fill="#a8a29e">
+      <rect x="69" y="75" width="10" height="10" rx="1"/>
+      <circle cx="74" cy="105" r="5"/><circle cx="74" cy="130" r="5"/><circle cx="74" cy="155" r="5"/><circle cx="74" cy="180" r="5"/>
+      <circle cx="74" cy="205" r="5"/><circle cx="74" cy="230" r="5"/><circle cx="74" cy="255" r="5"/><circle cx="74" cy="280" r="5"/>
+      <circle cx="74" cy="305" r="5"/><circle cx="74" cy="330" r="5"/><circle cx="74" cy="355" r="5"/><circle cx="74" cy="380" r="5"/>
+      <circle cx="74" cy="405" r="5"/><circle cx="74" cy="430" r="5"/><circle cx="74" cy="455" r="5"/><circle cx="74" cy="480" r="5"/>
+      <circle cx="74" cy="505" r="5"/><circle cx="74" cy="530" r="5"/><circle cx="74" cy="555" r="5"/>
+    </g>
+    <text x="86" y="84" font-size="11" fill="#78716c">1</text>
+    <!-- right column, pins 40 (top) .. 21 (bottom); y = 80 + (40 - n) * 25 -->
+    <g fill="#a8a29e">
+      <circle cx="196" cy="80" r="5"/><circle cx="196" cy="105" r="5"/><circle cx="196" cy="130" r="5"/><circle cx="196" cy="155" r="5"/>
+      <circle cx="196" cy="205" r="5"/><circle cx="196" cy="230" r="5"/><circle cx="196" cy="255" r="5"/><circle cx="196" cy="280" r="5"/>
+      <circle cx="196" cy="305" r="5"/><circle cx="196" cy="330" r="5"/><circle cx="196" cy="355" r="5"/><circle cx="196" cy="380" r="5"/>
+      <circle cx="196" cy="405" r="5"/><circle cx="196" cy="430" r="5"/>
+    </g>
+    <text x="184" y="84" text-anchor="end" font-size="11" fill="#78716c">40</text>
+
+    <!-- pin 36, 3V3(OUT): leave open -->
+    <circle cx="196" cy="180" r="6" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+    <path d="M 214 170 l 16 16 M 230 170 l -16 16" stroke="#dc2626" stroke-width="2.5"/>
+    <text x="184" y="177" text-anchor="end" font-size="11.5" fill="#b91c1c">3V3(OUT)</text>
+    <text x="184" y="191" text-anchor="end" font-size="11.5" fill="#b91c1c">pin 36</text>
+    <text x="238" y="183" font-size="12.5" fill="#b91c1c">leave open</text>
+
+    <!-- used pins -->
+    <g font-size="12" text-anchor="end" fill="#1c1917">
+      <text x="184" y="459"><tspan font-weight="700">TMS</tspan> GP19 · 25</text>
+      <text x="184" y="484"><tspan font-weight="700">TCK</tspan> GP18 · 24</text>
+      <text x="184" y="509"><tspan font-weight="700">GND</tspan> · 23</text>
+      <text x="184" y="534"><tspan font-weight="700">TDO</tspan> GP17 · 22</text>
+      <text x="184" y="559"><tspan font-weight="700">TDI</tspan> GP16 · 21</text>
+    </g>
+  </g>
+
+  <!-- ===== wires (drawn before the pads of P1 so the pads stay on top) ===== -->
+  <g fill="none" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 196 495 H 430 V 255 H 765 V 280 H 790" stroke="#7c3aed"/>
+    <path d="M 196 520 H 460 V 305 H 765 V 330 H 790" stroke="#d97706"/>
+    <path d="M 196 545 H 490 V 330 H 740" stroke="#1c1917"/>
+    <path d="M 196 570 H 520 V 355 H 765 V 380 H 790" stroke="#059669"/>
+    <path d="M 196 595 H 550 V 405 H 765 V 430 H 790" stroke="#2563eb"/>
+  </g>
+  <!-- wire end dots on the Pico -->
+  <g>
+    <circle cx="196" cy="495" r="7" fill="#7c3aed"/>
+    <circle cx="196" cy="520" r="7" fill="#d97706"/>
+    <circle cx="196" cy="545" r="7" fill="#1c1917"/>
+    <circle cx="196" cy="570" r="7" fill="#059669"/>
+    <circle cx="196" cy="595" r="7" fill="#2563eb"/>
+  </g>
+
+  <!-- ===== header P1 (same orientation as p1_pinout.svg: board edge left, J3 down) ===== -->
+  <text x="765" y="190" text-anchor="middle" font-size="14" font-weight="600" fill="#1c1917">P1</text>
+  <text x="765" y="580" text-anchor="middle" font-size="11.5" fill="#57534e">board edge ← · J3 ↓</text>
+  <path d="M 715 202 H 815 V 558 H 715 V 450 M 715 310 V 202" fill="none" stroke="#44403c" stroke-width="2.5"/>
+  <path d="M 715 310 H 705 V 450 H 715" fill="none" stroke="#44403c" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <!-- pads: odd x=740, even x=790, rows y = 230 + 50 r -->
+  <g font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <rect x="730" y="220" width="20" height="20" rx="2" fill="#292524"/><text x="740" y="234">1</text>
+    <circle cx="790" cy="230" r="10" fill="#ffffff" stroke="#dc2626" stroke-width="2"/><text x="790" y="234" fill="#b91c1c">2</text>
+    <circle cx="740" cy="280" r="10" fill="#292524"/><text x="740" y="284">3</text>
+    <circle cx="790" cy="280" r="10" fill="#7c3aed"/><text x="790" y="284">4</text>
+    <circle cx="740" cy="330" r="10" fill="#1c1917" stroke="#ffffff" stroke-width="1.5"/><text x="740" y="334">5</text>
+    <circle cx="790" cy="330" r="10" fill="#d97706"/><text x="790" y="334">6</text>
+    <circle cx="740" cy="380" r="10" fill="#d6d3d1"/><text x="740" y="384" fill="#57534e">7</text>
+    <circle cx="790" cy="380" r="10" fill="#059669"/><text x="790" y="384">8</text>
+    <circle cx="740" cy="430" r="10" fill="#d6d3d1"/><text x="740" y="434" fill="#57534e">9</text>
+    <circle cx="790" cy="430" r="10" fill="#2563eb"/><text x="790" y="434">10</text>
+    <circle cx="740" cy="480" r="10" fill="#d6d3d1"/><text x="740" y="484" fill="#57534e">11</text>
+    <circle cx="790" cy="480" r="10" fill="#d6d3d1"/><text x="790" y="484" fill="#57534e">12</text>
+    <circle cx="740" cy="530" r="10" fill="#d6d3d1"/><text x="740" y="534" fill="#57534e">13</text>
+    <circle cx="790" cy="530" r="10" fill="#d6d3d1"/><text x="790" y="534" fill="#57534e">14</text>
+  </g>
+
+  <!-- labels right of P1 -->
+  <g font-size="12.5" fill="#1c1917">
+    <text x="835" y="234">1 GND │ 2 <tspan fill="#b91c1c">3V3 – leave open</tspan></text>
+    <text x="835" y="284">3 GND │ 4 <tspan font-weight="700" fill="#6d28d9">TMS</tspan></text>
+    <text x="835" y="334">5 <tspan font-weight="700">GND</tspan> │ 6 <tspan font-weight="700" fill="#b45309">TCK</tspan></text>
+    <text x="835" y="384">7 SPI_DI │ 8 <tspan font-weight="700" fill="#047857">TDO</tspan></text>
+    <text x="835" y="434">9 SPI_WP# │ 10 <tspan font-weight="700" fill="#1d4ed8">TDI</tspan></text>
+    <text x="835" y="484">11 SPI_CLK │ 12 SPI_DO</text>
+    <text x="835" y="534">13 SPI_HOLD# │ 14 SPI_CS#</text>
+  </g>
+
+  <!-- notes -->
+  <g font-size="13" fill="#1c1917">
+    <text x="30" y="672">• Power the ATA Express from its own supply. Do not connect any 3.3 V between Pico and board.</text>
+    <text x="30" y="694">• With jumper wires use <tspan font-family="ui-monospace, Menlo, Consolas, monospace">--freq 1000000</tspan> (1 MHz). On the board each JTAG line has 33 Ω in series and a BAT54SW clamp.</text>
+    <text x="30" y="716">• GND may go to P1 pin 1, 3 or 5. TDO is the only line driven by the board (FPGA → Pico GP17).</text>
+  </g>
+</svg>
