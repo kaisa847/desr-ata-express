@@ -62,7 +62,14 @@ module sce_security #(
     input  wire        spi_miso_i,
     output wire        spi_wp_o,
     output wire        spi_hold_o,
-    output wire        spi_oe
+    output wire        spi_oe,
+    // HDD ID via JTAG (psx5), driven by re_capture
+    input  wire        id_wr_we,       // pulse: set idm word (volatile)
+    input  wire [7:0]  id_wr_wa,
+    input  wire [15:0] id_wr_wd,
+    input  wire        id_commit,      // pulse: write the idm to the W25X40 (WRITE_ID_EN && flash_ok)
+    input  wire [7:0]  id_rd_ra,
+    output wire [15:0] id_rd_q
 );
     localparam [7:0] SUB_IDENT = 8'hEC, SUB_RD_ID = 8'h20, SUB_WR_ID = 8'h30;
     localparam [7:0] E_ABRT = 8'h04;
@@ -123,13 +130,16 @@ module sce_security #(
     reg        q_v1 = 1'b0, q_v2 = 1'b0;   // copy pipeline buffer -> ID
     reg [7:0]  q_a1 = 8'h00, q_a2 = 8'h00;
     reg        bad = 1'b0;           // error during program/verify
+    reg        jcommit = 1'b0;       // a running commit came via JTAG (no ATA finish)
 
     assign busy = (st >= S_DISP) || pend;
+    assign id_rd_q = idm_q;
 
     // Read address of the ID memory
     always @* begin
         case (st)
             S_OUT:   idm_ra = k[7:0];
+            S_IDLE:  idm_ra = id_rd_ra;         // idle: JTAG may read the idm back
             default: idm_ra = bi[8:1];          // program and verify: byte bi
         endcase
     end
@@ -195,10 +205,17 @@ module sce_security #(
             end
         end
 
-        // ---- Idle: accept command
-        S_IDLE: if (pend) begin
-            pend <= 1'b0;
-            st <= S_DISP;
+        // ---- Idle: accept command, or serve a JTAG HDD-ID request (psx5)
+        S_IDLE: begin
+            if (pend) begin
+                pend <= 1'b0;
+                st <= S_DISP;
+            end else if (id_wr_we) begin
+                idm_we <= 1'b1; idm_wa <= id_wr_wa; idm_wd <= id_wr_wd;   // set the ID volatile
+            end else if (id_commit && WRITE_ID_EN != 0 && flash_ok) begin
+                err_code <= 8'h00; bad <= 1'b0; jcommit <= 1'b1;          // write the idm to the flash
+                st <= S_ERASE;
+            end
         end
         S_DISP: begin
             k <= 9'd0; err_code <= 8'h00; bad <= 1'b0;
@@ -278,9 +295,9 @@ module sce_security #(
 
         // ---- Completion
         S_FIN: begin
-            finish <= 1'b1;
+            finish <= ~jcommit;                 // a JTAG commit produces no ATA finish
             if (bad) err_code <= E_ABRT;
-            bad <= 1'b0;
+            bad <= 1'b0; jcommit <= 1'b0;
             st <= S_IDLE;
         end
         S_ABORT: if (!f_busy && !f_start) begin
@@ -297,7 +314,7 @@ module sce_security #(
         end
 
         if (rst) begin
-            st <= S_JED; pend <= 1'b0; id_ready <= 1'b0; flash_ok <= 1'b0;
+            st <= S_JED; pend <= 1'b0; id_ready <= 1'b0; flash_ok <= 1'b0; jcommit <= 1'b0;
             need_in <= 1'b0; need_out <= 1'b0; phase_req <= 1'b0; finish <= 1'b0;
             p_v <= 1'b0; q_v1 <= 1'b0; q_v2 <= 1'b0; buf_we <= 1'b0; idm_we <= 1'b0;
         end

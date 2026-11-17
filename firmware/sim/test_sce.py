@@ -122,6 +122,49 @@ def check_end(dut, flash, state):
         assert not flash.errors, "flash protocol: " + "; ".join(flash.errors[:5])
 
 
+async def jtag_write_id(dut, words):
+    """Set the ID volatile in the idm (JTAG path, only valid while idle)."""
+    await RisingEdge(dut.clk)
+    dut.id_wr_we.value = 1
+    for i, w in enumerate(words):
+        dut.id_wr_wa.value = i
+        dut.id_wr_wd.value = w
+        await RisingEdge(dut.clk)
+    dut.id_wr_we.value = 0
+    await RisingEdge(dut.clk)
+
+
+async def jtag_read_id(dut):
+    """Read the idm back (for the check)."""
+    out = []
+    await RisingEdge(dut.clk)
+    for i in range(256):
+        dut.id_rd_ra.value = i
+        await RisingEdge(dut.clk)
+        await RisingEdge(dut.clk)
+        out.append(int(dut.id_rd_q.value))
+    return out
+
+
+async def jtag_commit(dut, timeout_us=50000):
+    """Write the idm to the W25X40; waits until busy falls again."""
+    await RisingEdge(dut.clk)
+    dut.id_commit.value = 1
+    await RisingEdge(dut.clk)
+    dut.id_commit.value = 0
+    for _ in range(100):
+        await RisingEdge(dut.clk)
+        if int(dut.busy.value):
+            break
+    else:
+        raise AssertionError("commit did not start (busy stayed 0)")
+    for _ in range(timeout_us * 100):
+        await RisingEdge(dut.clk)
+        if int(dut.busy.value) == 0:
+            return
+    raise AssertionError("commit hangs")
+
+
 # ----------------------------------------------------------------------
 @cocotb.test()
 async def test_empty_flash_default_id(dut):
@@ -259,6 +302,66 @@ async def test_write_id_protected(dut):
     err, phase, _ = await sce_cmd(dut, 0x30, data_out=words_of(new))
     assert err == E_ABRT and phase == "out"
     assert bytes(flash.mem[0:512]) == bytes([0xFF]) * 512
+    check_end(dut, flash, st)
+
+
+@cocotb.test()
+async def test_jtag_set_id_volatile(dut):
+    """JTAG sets the ID volatile (no commit): ECh returns it, the flash stays unchanged,
+    and after a reset the old flash ID is back."""
+    flash = W25X40(dut)
+    old = bytes((i * 11 + 5) & 0xFF for i in range(512))
+    flash.mem[ID_ADDR:ID_ADDR + 512] = old
+    st = await boot(dut, flash)
+    await wait_ready(dut)
+    new = bytes(random.randrange(256) for _ in range(512))
+    w = words_of(new)
+    await jtag_write_id(dut, w)
+    assert await jtag_read_id(dut) == w, "idm read-back does not match"
+    n_log = len(flash.log)
+    err, phase, data = await sce_cmd(dut, 0xEC)
+    assert err == 0 and phase == "in" and data == w, "ECh does not return the volatile ID"
+    assert len(flash.log) == n_log, "setting it volatile touched the flash"
+    assert bytes(flash.mem[ID_ADDR:ID_ADDR + 512]) == old, "the flash was changed"
+    # reset: the old flash ID again
+    dut.rst.value = 1
+    await ClockCycles(dut.clk, 5)
+    dut.rst.value = 0
+    await ClockCycles(dut.clk, 5)
+    await wait_ready(dut)
+    err, phase, data = await sce_cmd(dut, 0xEC)
+    assert err == 0 and data == words_of(old), "not the old ID after reset"
+    check_end(dut, flash, st)
+
+
+@cocotb.test()
+async def test_jtag_set_id_commit(dut):
+    """JTAG sets the ID and writes it to the W25X40 with a commit: persists across power cycles."""
+    flash = W25X40(dut)
+    flash.mem[ID_ADDR:ID_ADDR + 4096] = bytes([0x33]) * 4096
+    flash.mem[0x1000:0x2000] = bytes([0xA5]) * 4096
+    st = await boot(dut, flash)
+    await wait_ready(dut)
+    new = bytes(random.randrange(256) for _ in range(512))
+    w = words_of(new)
+    await jtag_write_id(dut, w)
+    assert await jtag_read_id(dut) == w
+    assert bytes(flash.mem[ID_ADDR:ID_ADDR + 512]) == bytes([0x33]) * 512, "written before the commit"
+    await jtag_commit(dut)
+    assert bytes(flash.mem[ID_ADDR:ID_ADDR + 512]) == new, "the commit did not write the ID"
+    assert bytes(flash.mem[ID_ADDR + 512:ID_ADDR + 4096]) == bytes([0xFF]) * (4096 - 512)
+    assert bytes(flash.mem[0x1000:0x2000]) == bytes([0xA5]) * 4096, "neighbouring sector changed"
+    assert int(dut.finish.value) == 0, "the commit produced an ATA finish"
+    err, phase, data = await sce_cmd(dut, 0xEC)
+    assert err == 0 and phase == "in" and data == w
+    # reset: loaded from the flash
+    dut.rst.value = 1
+    await ClockCycles(dut.clk, 5)
+    dut.rst.value = 0
+    await ClockCycles(dut.clk, 5)
+    await wait_ready(dut)
+    err, phase, data = await sce_cmd(dut, 0xEC)
+    assert err == 0 and data == w, "not the new ID after reset"
     check_end(dut, flash, st)
 
 

@@ -58,6 +58,17 @@ module ata_device #(
     output wire        spi_wp_o,
     output wire        spi_hold_o,
     output wire        spi_oe,
+    // HDD ID via JTAG (RE only), passed through to sce_security; tied to 0 in non-RE builds
+    input  wire        id_wr_we,
+    input  wire [7:0]  id_wr_wa,
+    input  wire [15:0] id_wr_wd,
+    input  wire        id_commit,
+    input  wire [7:0]  id_rd_ra,
+    output wire [15:0] id_rd_q,
+    output wire [7:0]  id_jedec,
+    output wire        id_flash_ok,
+    output wire        id_sce_busy,
+    output wire        id_ready,
     // Medium
     input  wire        media_busy,         // initialization running
     input  wire        media_ready,        // card ready, capacity valid
@@ -1018,7 +1029,9 @@ module ata_device #(
         .need_in(sce_need_in), .need_out(sce_need_out), .phase_req(sce_phase_req),
         .phase_done(sce_phase_done), .finish(sce_finish), .err_code(sce_err),
         .buf_addr(sce_addr), .buf_we(sce_we), .buf_wd(sce_wd), .buf_q(a_q),
-        .busy(), .id_ready(), .flash_ok(), .jedec_mfr(),
+        .busy(id_sce_busy), .id_ready(id_ready), .flash_ok(id_flash_ok), .jedec_mfr(id_jedec),
+        .id_wr_we(id_wr_we), .id_wr_wa(id_wr_wa), .id_wr_wd(id_wr_wd), .id_commit(id_commit),
+        .id_rd_ra(id_rd_ra), .id_rd_q(id_rd_q),
         .spi_sck_o(spi_sck_o), .spi_cs_n_o(spi_cs_n_o), .spi_mosi_o(spi_mosi_o), .spi_miso_i(spi_miso_i),
         .spi_wp_o(spi_wp_o), .spi_hold_o(spi_hold_o), .spi_oe(spi_oe)
     );

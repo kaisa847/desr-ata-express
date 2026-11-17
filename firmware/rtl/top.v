@@ -108,6 +108,12 @@ module top #(
     wire dmarq_o, dmarq_oe, iordy_o, iordy_oe;
     wire spi_sck, spi_cs_n, spi_mosi, spi_wp, spi_hold, spi_oe;
 
+    // HDD ID via JTAG (psx5): re_capture <-> sce_security (through ata_device). Driven only in the RE build.
+    wire        id_wr_we, id_commit;
+    wire [7:0]  id_wr_wa, id_rd_ra, id_jedec;
+    wire [15:0] id_wr_wd, id_rd_q;
+    wire        id_flash_ok, id_sce_busy, id_ready;
+
     ata_device #(.MS_DIV(MS_DIV), .UDMA_MAX(UDMA_MAX), .DMA_DLY_US(DMA_DLY_US), .DMA_EN(DMA_EN), .USE_IDDR(USE_IDDR),
                  .DLY_TAPS(DLY_TAPS), .CBL80(CBL80),
                  .SCE_WRITE_ID_EN(SCE_WRITE_ID_EN)) u_ata (
@@ -121,6 +127,9 @@ module top #(
         .iordy_o(iordy_o), .iordy_oe(iordy_oe),
         .spi_sck_o(spi_sck), .spi_cs_n_o(spi_cs_n), .spi_mosi_o(spi_mosi), .spi_miso_i(SPI_DO),
         .spi_wp_o(spi_wp), .spi_hold_o(spi_hold), .spi_oe(spi_oe),
+        .id_wr_we(id_wr_we), .id_wr_wa(id_wr_wa), .id_wr_wd(id_wr_wd), .id_commit(id_commit),
+        .id_rd_ra(id_rd_ra), .id_rd_q(id_rd_q), .id_jedec(id_jedec), .id_flash_ok(id_flash_ok),
+        .id_sce_busy(id_sce_busy), .id_ready(id_ready),
         .media_busy(media_busy), .media_ready(media_ready), .media_sectors(media_sectors),
         .blk_start(blk_start), .blk_we(blk_we), .blk_lba(blk_lba), .blk_slot(blk_slot),
         .blk_count(blk_count), .blk_consumed(blk_consumed), .blk_abort(blk_abort), .blk_ack(blk_ack), .blk_err(blk_err), .blk_busy(blk_busy),
@@ -313,10 +322,15 @@ module top #(
                 .clk(clk), .rst(rst),
                 .tap_v(tap_v), .tap_i(tap_i), .tap_b(tap_b), .tap_lba(tap_lba), .tap_we(tap_we), .tap_sec(tap_sec),
                 .cmd(re_cmd), .arg(re_arg), .raddr(re_raddr), .rdata(re_rdata),
-                .ev_req(re_req), .ev_d(re_d), .ev_ack(re_ack)
+                .ev_req(re_req), .ev_d(re_d), .ev_ack(re_ack),
+                .id_wr_we(id_wr_we), .id_wr_wa(id_wr_wa), .id_wr_wd(id_wr_wd), .id_commit(id_commit),
+                .id_rd_ra(id_rd_ra), .id_rd_q(id_rd_q), .id_jedec(id_jedec), .id_flash_ok(id_flash_ok),
+                .id_busy(id_sce_busy), .id_ready(id_ready)
             );
         end else begin : g_nore
             assign re_req = 1'b0; assign re_d = 64'd0; assign re_rdata = 64'd0;
+            assign id_wr_we = 1'b0; assign id_commit = 1'b0; assign id_wr_wa = 8'd0;
+            assign id_wr_wd = 16'd0; assign id_rd_ra = 8'd0;
         end
         dbg_jtag u_dbg (
             .re_req(re_req), .re_d(re_d), .re_ack(re_ack), .re_cmd(re_cmd), .re_arg(re_arg),
@@ -338,6 +352,8 @@ module top #(
         assign dbg_dly = 7'd0;
         assign sd_cap_ack = 1'b0;
         assign dbg_reinit = 1'b0;
+        assign id_wr_we = 1'b0; assign id_commit = 1'b0; assign id_wr_wa = 8'd0;
+        assign id_wr_wd = 16'd0; assign id_rd_ra = 8'd0;
     end endgenerate
     // IDELAY reference for UDMA 4/5 (data-out): PLL 100 -> 200 MHz, IDELAYCTRL calibrates the taps
     localparam integer SD_IDLY = (SD_PATH == 1 && SD_ENABLE_UHS != 0 && SD_ENABLE_DDR != 0) ? 1 : 0;

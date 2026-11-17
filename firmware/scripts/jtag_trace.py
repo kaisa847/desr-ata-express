@@ -18,7 +18,11 @@ Usage:
     ... jtag_trace.py --capture <lba> <count 1-16> <r|w|rw>           # arm the sector capture
     ... jtag_trace.py --capture-status | --capture-off
     ... jtag_trace.py --capture-read [--dir <folder>]                 # captured sectors as .bin/.txt
+    ... jtag_trace.py --id-status                                     # HDD ID status (psx5, target m2re)
+    ... jtag_trace.py --set-id file.bin [--commit-id]                 # set the HDD ID (volatile, or into the W25X40)
+    ... jtag_trace.py --read-id [file.bin]                            # read the HDD ID back from the idm
 The RE commands (RE_CAPTURE.md) only observe; they write nothing to the card.
+Exception: --commit-id writes the given HDD ID into the W25X40 (see RE_CAPTURE.md, PSX.md).
 The trace is frozen while it is read and released afterwards (except with --keep-frozen).
 Captures go to --dir, default $RE_CAPTURE_DIR if set, else firmware/build/captures.
 """
@@ -407,6 +411,41 @@ def capture_read(j, outdir):
         print("Nothing captured yet, no file written.")
 
 
+# ---- RE: set the HDD ID via JTAG (re_capture.v codes 4/5, read-back 2051/2304), target m2re only (psx5)
+def id_status(j):
+    v = re_read_list(j, [2051])[0]
+    return dict(jedec=v & 0xFF, flash_ok=(v >> 8) & 1, busy=(v >> 9) & 1, ready=(v >> 10) & 1)
+
+
+def print_id_status(s):
+    print(f"HDD ID: JEDEC manufacturer {s['jedec']:02X}h ({'flash present' if s['flash_ok'] else 'no flash'}), "
+          f"sce {'busy' if s['busy'] else 'idle'}, ID {'loaded' if s['ready'] else 'not loaded'}")
+
+
+def id_set(j, data):
+    if len(data) != 512:
+        raise SystemExit("the ID must be exactly 512 bytes")
+    for k in range(256):
+        w = data[2 * k] | (data[2 * k + 1] << 8)
+        re_cmd(j, (4 << 60) | k | (w << 8))
+
+
+def id_read(j):
+    words = re_read_list(j, [2304 + k for k in range(256)])
+    return b"".join((w & 0xFFFF).to_bytes(2, "little") for w in words)
+
+
+def id_commit(j):
+    if not id_status(j)["flash_ok"]:
+        raise SystemExit("no W25X40 detected (flash_ok=0), commit not possible")
+    re_cmd(j, 5 << 60)
+    for _ in range(400):
+        time.sleep(0.03)
+        if not id_status(j)["busy"]:
+            return True
+    return False
+
+
 def main():
     ap = argparse.ArgumentParser(description="Read the ATA Express bus trace via JTAG (DirtyJTAG, USER1). "
                                  "Read only: nothing is configured and nothing is flashed.")
@@ -426,6 +465,12 @@ def main():
     ap.add_argument("--capture-off", action="store_true", help="sector capture off (data stays readable)")
     ap.add_argument("--capture-status", action="store_true", help="show capture state and CRC trace window")
     ap.add_argument("--capture-read", action="store_true", help="write the captured sectors to --dir")
+    # HDD ID via JTAG (psx5, target m2re): the DVR-SPEED derives the key from this ID (PSX.md)
+    ap.add_argument("--set-id", metavar="FILE", help="set a 512-byte HDD ID volatile (target m2re)")
+    ap.add_argument("--commit-id", action="store_true", help="write the set ID to the W25X40 (persists across power cycles)")
+    ap.add_argument("--read-id", nargs="?", const="-", metavar="FILE",
+                    help="read the HDD ID back from the idm (optionally into FILE)")
+    ap.add_argument("--id-status", action="store_true", help="HDD ID status (JEDEC, flash, busy, loaded)")
     # old option names, kept as undocumented aliases
     ap.add_argument("--fang", nargs=3, dest="capture", help=argparse.SUPPRESS)
     ap.add_argument("--fang-aus", action="store_true", dest="capture_off", help=argparse.SUPPRESS)
@@ -459,6 +504,34 @@ def main():
         idc = j.dr(0, 32)
         print(f"IDCODE {idc:08X}" + ("" if (idc & 0x0FFFFFFF) == 0x3631093 else "  (unexpected!)"))
         j.ir(IR_USER1)
+        if a.set_id or a.commit_id or a.read_id is not None or a.id_status:
+            if split(j.dr(ctrl(), DRLEN))["mark"] != 2:
+                print("No trace core found. Is a bitstream with RE_CAPTURE (target m2re) loaded?")
+                return 1
+            print_id_status(id_status(j))
+            if a.set_id:
+                data = open(a.set_id, "rb").read()
+                id_set(j, data)
+                back = id_read(j)
+                if back == data:
+                    print(f"ID set ({len(data)} bytes, crc {zlib.crc32(data) & 0xFFFFFFFF:08X}), read-back matches.")
+                else:
+                    n = sum(a_ != b_ for a_, b_ in zip(back, data))
+                    print(f"WARNING: read-back differs in {n} bytes. ID NOT set reliably (sce may not be idle).")
+                    return 2
+            if a.commit_id:
+                ok = id_commit(j)
+                print("Commit to the W25X40 " + ("done (takes effect at the next DVRP boot)." if ok else "HANGS (timeout)."))
+                if not ok:
+                    return 2
+            if a.read_id is not None:
+                data = id_read(j)
+                print(f"HDD ID from the idm: {len(data)} bytes, crc {zlib.crc32(data) & 0xFFFFFFFF:08X}, "
+                      f"first 16 {data[:16].hex()}")
+                if a.read_id != "-":
+                    open(a.read_id, "wb").write(data)
+                    print("written:", a.read_id)
+            return 0
         if a.crc or a.capture or a.capture_off or a.capture_status or a.capture_read:
             if split(j.dr(ctrl(), DRLEN))["mark"] != 2:
                 print("No trace core found (signature missing). Is a bitstream with DBG_JTAG loaded?")

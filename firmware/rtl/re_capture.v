@@ -16,6 +16,8 @@
 //   1  arm capture:  [31:0] start LBA, [35:32] count-1, [37:36] directions. Clears all slots.
 //   2  capture off (data stays readable)
 //   3  CRC trace: [31:0] first LBA, [59:32] count (0 = off, FFFFFFF = unlimited)
+//   4  set HDD-ID word (psx5): [7:0] word address, [23:8] value -> idm in sce_security
+//   5  commit the idm to the W25X40 (psx5), persistent across power cycles
 // Read (rsel = 1, raddr):
 //   0..1023     sector data: slot raddr[9:6], words 4*raddr[5:0] .. +3 ([15:0] = first word)
 //   1024+k      slot k: [31:0] CRC32 (0 while empty), [32] captured, [33] direction (1 = write)
@@ -23,6 +25,8 @@
 //               [63:48] mask of captured slots
 //   2049        [31:0] first LBA of the CRC trace, [59:32] count
 //   2050        [31:0] total completed sectors, [63:32] of which without all 512 bytes
+//   2051        HDD-ID status (psx5): [7:0] JEDEC manufacturer, [8] flash present, [9] busy, [10] id loaded
+//   2304+k      HDD-ID word k from the idm (psx5), [15:0]
 module re_capture (
     input  wire        clk,
     input  wire        rst,
@@ -41,7 +45,18 @@ module re_capture (
     // Entry for the trace
     output reg         ev_req = 1'b0,
     output reg  [63:0] ev_d = 64'd0,
-    input  wire        ev_ack
+    input  wire        ev_ack,
+    // HDD ID via JTAG (psx5): write/read/commit the idm in sce_security
+    output reg         id_wr_we = 1'b0,
+    output reg  [7:0]  id_wr_wa = 8'd0,
+    output reg  [15:0] id_wr_wd = 16'd0,
+    output reg         id_commit = 1'b0,
+    output reg  [7:0]  id_rd_ra = 8'd0,
+    input  wire [15:0] id_rd_q,
+    input  wire [7:0]  id_jedec,
+    input  wire        id_flash_ok,
+    input  wire        id_busy,
+    input  wire        id_ready
 );
     function [31:0] crc8;                    // one byte, LSB first
         input [31:0] c;
@@ -146,17 +161,22 @@ module re_capture (
             end
         end
         if (fc_we) fcrc[fc_wa] <= fc_wd;
+        id_wr_we  <= 1'b0;                        // pulse, one clock only
+        id_commit <= 1'b0;
         if (cmd) begin
             case (arg[63:60])
             4'd1: begin f_lba <= arg[31:0]; f_n1 <= arg[35:32]; f_dir <= arg[37:36];
                         f_arm <= 1'b1; f_val <= 16'd0; f_wdir <= 16'd0; end
             4'd2: f_arm <= 1'b0;
             4'd3: begin c_lo <= arg[31:0]; c_n <= arg[59:32]; end
+            4'd4: begin id_wr_we <= 1'b1; id_wr_wa <= arg[7:0]; id_wr_wd <= arg[23:8]; end  // set an idm word
+            4'd5: id_commit <= 1'b1;                                                        // commit idm to W25X40
             default: ;
             endcase
         end
         if (rst) begin
             f_arm <= 1'b0; f_val <= 16'd0; c_n <= 28'd0; ev_req <= 1'b0; n_sec <= 32'd0; n_part <= 32'd0;
+            id_wr_we <= 1'b0; id_commit <= 1'b0;
         end
     end
 
@@ -167,7 +187,8 @@ module re_capture (
     reg [31:0] cq = 32'd0;
     reg [11:0] ra = 12'd0;
     always @(posedge clk) begin
-        ra   <= raddr;
+        ra       <= raddr;
+        id_rd_ra <= raddr[7:0];             // idm readback: one address ahead of the rdata decode
         rc   <= rc + 1'b1;
         rc_d <= rc;
         fq   <= fmem[{ra[9:0], rc}];
@@ -180,10 +201,12 @@ module re_capture (
         cq <= fcrc[ra[3:0]];
         if (!ra[11] && !ra[10]) rdata <= dat64;
         else if (!ra[11])       rdata <= {30'd0, f_wdir[ra[3:0]], f_val[ra[3:0]], f_val[ra[3:0]] ? cq : 32'd0};
-        else case (ra[1:0])
-            2'd0:    rdata <= {f_val, 9'd0, f_arm, f_dir, f_n1, f_lba};
-            2'd1:    rdata <= {4'd0, c_n, c_lo};
-            default: rdata <= {n_part, n_sec};
+        else if (ra[11:8] == 4'h9) rdata <= {48'd0, id_rd_q};                      // 2304+k: idm word
+        else case (ra[2:0])
+            3'd0:    rdata <= {f_val, 9'd0, f_arm, f_dir, f_n1, f_lba};             // 2048
+            3'd1:    rdata <= {4'd0, c_n, c_lo};                                    // 2049
+            3'd2:    rdata <= {n_part, n_sec};                                      // 2050
+            default: rdata <= {53'd0, id_ready, id_busy, id_flash_ok, id_jedec};    // 2051 status
         endcase
     end
 endmodule

@@ -10,6 +10,7 @@ The firmware only observes. It does not modify any data and does not write anyth
   - Tap `tap_*` in `rtl/sd/sd_host.v`.
   - JTAG connection in `rtl/dbg_jtag.v`.
   - Parameter `RE_CAPTURE` in `rtl/top.v` (default 0).
+  - **psx5:** `re_capture.v` also carries the HDD-ID-via-JTAG path (codes 4/5) through to `sce_security.v`; see "HDD ID via JTAG" below.
 - **Build target `m2re`:** `m2w` (UDMA 4, DDR50, open CMD25, like psx3) plus `RE_CAPTURE = 1`. All other targets stay unchanged.
 - **Simulation, passed:**
   - `re` (SDR 50 MHz) and `re_ddr` (DDR50 with open CMD25), 3 tests each:
@@ -57,6 +58,31 @@ Failed attempts that are retried therefore do not show up.
   - The CRC is written as 8 hex digits in upper case, as in `karte_lesen.py` of the PSX test bench (not in this repo).
   - With `rw` two file pairs are created, one per direction.
 
+## HDD ID via JTAG (psx5)
+
+From release candidate psx5 on, `re_capture.v` can also set the HDD ID over JTAG, so the encryption key
+(which the DVR-SPEED derives from the ID, see [`PSX.md`](PSX.md)) can be changed for an experiment
+without re-flashing the FPGA. The data path still writes nothing to the card; the only thing this can
+change is the HDD ID in the W25X40, and only on an explicit `--commit-id`.
+
+- **Codes 4/5** in `re_capture.v` drive `id_wr_we`/`id_commit` into `sce_security.v`. `sce_security.v`
+  accepts an idm word while idle, can read it back (read addresses 2304+k), reports a status word
+  (2051: JEDEC, flash present, busy, loaded), and on a commit reuses the existing WRITE-ID flash
+  machine. `SCE_WRITE_ID_EN` is unchanged.
+- **Volatile vs. persistent:** a volatile ID takes effect for 8Eh/ECh immediately but does **not**
+  change the key — the DVR-SPEED only pulls the ID at boot (proven on the hardware). Every key
+  experiment therefore needs `--commit-id` **and** a power cycle. `FF` × 512 restores the nullkey.
+- **Simulation:** `sim/test_sce.py` covers both paths (`test_jtag_set_id_volatile`,
+  `test_jtag_set_id_commit`): a volatile ID is returned by ECh and leaves the flash untouched; a
+  committed ID survives a reset, writes only its sector and produces no ATA finish.
+
+```
+jtag_trace.py --id-status                   # JEDEC manufacturer, flash present?, busy, ID loaded
+jtag_trace.py --set-id file.bin             # set a 512-byte ID volatile (+ read-back check)
+jtag_trace.py --set-id file.bin --commit-id # write the ID into the W25X40 (persists across power cycles)
+jtag_trace.py --read-id [file.bin]          # read the ID back from the idm
+```
+
 ## Usage (`scripts/jtag_trace.py`, via `bench.sh trace` or on the notebook)
 ```
 jtag_trace.py --crc <lba> <count>           # CRC trace for a window (or: all, off)
@@ -66,7 +92,8 @@ jtag_trace.py --capture-read [--dir <folder>]
 jtag_trace.py --capture-off                 # data stays readable
 jtag_trace.py                               # read the trace, including the CRC entries
 ```
-The settings live in FPGA registers. Reloading or powering off resets them; then everything is off.
+The settings live in FPGA registers. Reloading or powering off resets them; then everything is off
+(the committed HDD ID in the W25X40 is the exception — it persists until overwritten).
 
 ## Check on the PC (`scripts/re_check.py`)
 - **Prerequisite:** `m2re` loaded to SRAM (volatile, via JTAG), USB-IDE bridge plugged in, Pico on JTAG.

@@ -33,8 +33,10 @@ other boards, cards and consoles are the main reason it is public — see [Testi
   the board's W25X40 data flash, or 512 × `FFh` if that flash is empty (the same ID DVRPwned uses). A
   disk image that was created with a different ID (e.g. cloned from an original Sony drive, or formatted
   under the vendor firmware with a different ID) will not be readable. Once a PSX has formatted the card,
-  the ID must stay unchanged; every release keeps the ID logic identical to psx1. See
-  [`firmware/SCE.md`](firmware/SCE.md).
+  the ID must stay unchanged; the default ID and the write path are identical in every release. psx5 adds
+  a way to set the ID over JTAG for reverse-engineering the encryption, but it does nothing without an
+  explicit `jtag_trace.py --set-id/--commit-id`. See [`firmware/SCE.md`](firmware/SCE.md) and
+  [`firmware/PSX.md`](firmware/PSX.md).
 - **DDR50 needs a board modification.** R45–R50 are 0 Ω links that connect the six SD card
   lines to the direct 3.3 V path B, including its 10 kΩ pull-ups to 3.3 V (R62, R72–R76). In 1.8 V
   UHS-I mode these pull-ups are out of spec; removing R45–R50 is required for stable DDR50. They sit on the
@@ -120,7 +122,8 @@ Status keys: **HW** = verified on hardware, **Sim** = verified in simulation onl
 | ATA bus trace over JTAG (USER1, 4096 entries) | HW | `rtl/dbg_jtag.v`, read with `scripts/jtag_trace.py` via a Raspberry Pi Pico running DirtyJTAG; does not disturb the ATA side |
 | SD statistics, retry counters, DDR raw capture of a failing block | HW | `--status`, `--arm-cap`, `scripts/ddr_cap.py`, `scripts/ddr_eye.py` |
 | ATA command list from the trace, startup capture | Tool only | `jtag_trace.py --until-full --commands` freezes the trace before the ring overflows and lists every command with task file, SET FEATURES mode and result; `scripts/trace_commands.py` does the same for a saved trace, also as JSONL ([`firmware/TRACE_COMMANDS_FORMAT.md`](firmware/TRACE_COMMANDS_FORMAT.md)) |
-| Per-sector CRC32 in the trace, capture of up to 16 sectors | Sim | psx4 / target `m2re`; observe-only aid for analysing the PSX disk encryption ([`firmware/RE_CAPTURE.md`](firmware/RE_CAPTURE.md)) |
+| Per-sector CRC32 in the trace, capture of up to 16 sectors | HW (PSX) | psx4 / target `m2re`; observe-only aid, used in the PSX to characterise the disk encryption ([`firmware/RE_CAPTURE.md`](firmware/RE_CAPTURE.md), [`firmware/PSX.md`](firmware/PSX.md)) |
+| HDD ID settable via JTAG (volatile or committed to the W25X40) | Sim | psx5; for the encryption RE (the DVR-SPEED derives the key from the ID). Dormant without `jtag_trace.py --set-id` ([`firmware/RE_CAPTURE.md`](firmware/RE_CAPTURE.md)) |
 | LEDs | HW | LED0 heartbeat (fast = no card / error), LED1 ATA BSY, LED2 SD access, LED3 card ready (active low) |
 
 ### Configuration flash tooling (`scripts/bitcfg.py`, `scripts/mkflash.py`)
@@ -148,7 +151,8 @@ build, measurements and flashing commands.
 | [psx1](firmware/release/2026-11-11_psx1/) | 2026-11-11 | UDMA 2, SD 50 MHz SDR 3.3 V, streaming | read 19.8 MB/s, write 11.8 MB/s | tested on PC, flashed in the maintainer's PSX |
 | [psx2](firmware/release/2026-11-11_psx2/) | 2026-11-11 | + UDMA 4, UHS-I DDR50 with fallback | read 30.0 MB/s (USB limit), write 9.4 MB/s | tested on PC; UDMA 4 not yet seen on a real host |
 | [psx3](firmware/release/2026-11-11_psx3/) | 2026-11-11 | + open CMD25 (fast writes) | read 29.5 MB/s, write 25.7 MB/s | tested on PC; **recommended starting point** |
-| [psx4](firmware/release/2026-11-12_psx4/) | 2026-11-12 | psx3 + sector CRC32 / capture (observe only) | — | **candidate, not tested on hardware** |
+| [psx4](firmware/release/2026-11-12_psx4/) | 2026-11-12 | psx3 + sector CRC32 / capture (observe only) | — | flashed in the maintainer's PSX and used to characterise the disk encryption (see [`firmware/PSX.md`](firmware/PSX.md)) |
+| [psx5](firmware/release/2026-11-16_psx5/) | 2026-11-16 | psx4 + HDD ID settable via JTAG (for the encryption RE) | — | **candidate, built, not flashed yet** |
 
 ### Download
 
@@ -161,7 +165,8 @@ Ready-built bitstreams; no toolchain is needed to test. Load the `.bit` via JTAG
 | **psx3** | [`psx3.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx3/psx3.bit) | [`psx3.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx3/psx3.bin) | recommended |
 | **psx1** | [`psx1.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx1/psx1.bit) | [`psx1.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx1/psx1.bin) | most conservative: no UDMA 4, no 1.8 V/DDR50 |
 | **psx2** | [`psx2.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx2/psx2.bit) | [`psx2.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-11_psx2/psx2.bin) | superseded by psx3 |
-| **psx4** | [`psx4.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-12_psx4/psx4.bit) | [`psx4.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-12_psx4/psx4.bin) | untested candidate, for RE work |
+| **psx4** | [`psx4.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-12_psx4/psx4.bit) | [`psx4.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-12_psx4/psx4.bin) | sector capture, for RE work |
+| **psx5** | [`psx5.bit`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-16_psx5/psx5.bit) | [`psx5.bin`](https://github.com/kaisa847/desr-ata-express/raw/main/firmware/release/2026-11-16_psx5/psx5.bin) | psx4 + HDD ID via JTAG; built, not flashed yet |
 
 <details><summary>SHA-256</summary>
 
@@ -174,6 +179,8 @@ dd8da5d21bde8bf05dbadaf556fca66b71c00fbcd521f40b0539897abb01926d  psx2.bit
 e8eca20e78dd8be5becc9a9b845316aa1346e0d2039c2f20500fc0315c018cd3  psx2.bin
 ed4975d8228c8d158b002db56bd0e22b196341d45e557f493b840abccd531bb3  psx4.bit
 96e1fbec9a669eadf1591a901c1284989aae9209d9e2b22fe79dd589b1f31f52  psx4.bin
+b2abe8b7fddd534b977e92e28cbda52d71a60979d9b9458371f3059da1535ca4  psx5.bit
+4a58671cd0b8933afba9fdba152240764eb1f02a714419503e8f443080fc9add  psx5.bin
 ```
 
 </details>
@@ -266,6 +273,7 @@ Documentation:
 | [`STATUS.md`](firmware/STATUS.md) | Current state, findings, full hardware test log |
 | [`BUILD.md`](firmware/BUILD.md) | Toolchain, simulation, build targets, loading |
 | [`FLASH.md`](firmware/FLASH.md) | Configuration flash, load time, CRC, MultiBoot, flashing and recovery |
+| [`PSX.md`](firmware/PSX.md) | What we learned about the PSX: DVRP/DVR-SPEED, 8Eh/HDD ID, the disk encryption (CBC, key from the ID), hardware |
 | [`SCE.md`](firmware/SCE.md) | Sony command 8Eh and the HDD ID, with sources |
 | [`UDMA.md`](firmware/UDMA.md) | Ultra DMA engine design and timing budget |
 | [`UHS.md`](firmware/UHS.md) | UHS-I (1.8 V, DDR50), open CMD25 |

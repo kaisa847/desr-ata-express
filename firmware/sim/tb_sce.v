@@ -15,6 +15,12 @@ module tb_sce;
     wire       busy, id_ready, flash_ok;
     wire [7:0] jedec_mfr;
 
+    // HDD ID via JTAG (psx5): cocotb drives these directly (re_capture is not in this bench)
+    reg         id_wr_we = 1'b0, id_commit = 1'b0;
+    reg  [7:0]  id_wr_wa = 8'd0, id_rd_ra = 8'd0;
+    reg  [15:0] id_wr_wd = 16'd0;
+    wire [15:0] id_rd_q;
+
     // Buffer: port A = sce_security, port B = host model (instead of ata_device)
     wire [7:0]  s_addr;
     wire        s_we;
@@ -48,6 +54,8 @@ module tb_sce;
         .finish(finish), .err_code(err_code),
         .buf_addr(s_addr), .buf_we(s_we), .buf_wd(s_wd), .buf_q(s_q),
         .busy(busy), .id_ready(id_ready), .flash_ok(flash_ok), .jedec_mfr(jedec_mfr),
+        .id_wr_we(id_wr_we), .id_wr_wa(id_wr_wa), .id_wr_wd(id_wr_wd), .id_commit(id_commit),
+        .id_rd_ra(id_rd_ra), .id_rd_q(id_rd_q),
         .spi_sck_o(f_sck_o), .spi_cs_n_o(f_cs_n_o), .spi_mosi_o(f_mosi_o), .spi_miso_i(spi_miso),
         .spi_wp_o(f_wp_o), .spi_hold_o(f_hold_o), .spi_oe(f_oe)
     );
